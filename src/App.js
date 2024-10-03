@@ -1,24 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import MainLayout from './layout/MainLayout'; // Pour gérer la sidebar et le contenu
+import Dashboard from './pages/Dashboard';
+import Upload from './pages/Upload';
+import Documents from './pages/Documents';
+import Folders from './pages/Folders';
+import Users from './pages/Users';
+import Settings from './pages/Settings';
+import Login from './pages/Login';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      {/* Layout principal qui inclut la sidebar */}
+      <MainLayout>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/upload" element={<Upload />} />
+          <Route path="/documents" element={<Documents />} />
+          <Route path="/folders" element={<Folders />} />
+          <Route path="/users" element={<Users />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </MainLayout>
+    </Router>
   );
 }
 
