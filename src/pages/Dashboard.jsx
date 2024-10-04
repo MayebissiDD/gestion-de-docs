@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import DashboardStats from '../components/DashboardStats';
 import DocumentList from '../components/DocumentList';
-import { FaRegBell } from 'react-icons/fa'; // Pour l'icône de notification
+import { FaRegBell, FaFolder, FaFileAlt } from 'react-icons/fa'; // Icônes pour les notifications
 
 const Dashboard = () => {
   // Notifications état
@@ -16,6 +16,18 @@ const Dashboard = () => {
   const handleNotificationClick = () => {
     setIsNotificationOpen(!isNotificationOpen);
     setUnreadCount(0); // Marquer toutes les notifications comme lues
+  };
+
+  // Fonction pour renvoyer l'icône en fonction du type de notification
+  const getNotificationIcon = (type) => {
+    switch (type) {
+      case 'dossier':
+        return <FaFolder className="text-blue-500" />;
+      case 'fichier':
+        return <FaFileAlt className="text-green-500" />;
+      default:
+        return <FaFileAlt />;
+    }
   };
 
   return (
@@ -36,13 +48,19 @@ const Dashboard = () => {
           {isNotificationOpen && (
             <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
               <div className="p-4">
-                <h3 className="font-bold text-lg mb-2">Notifications</h3>
+                <h3 className="font-bold text-lg mb-4">Notifications</h3>
                 {notifications.length > 0 ? (
-                  <ul className="space-y-2">
+                  <ul className="space-y-3">
                     {notifications.map((notification, index) => (
-                      <li key={index} className="text-sm text-gray-700">
-                        {notification.message} <br />
-                        <span className="text-gray-500 text-xs">{notification.date}</span>
+                      <li key={index} className="flex items-start p-2 bg-gray-50 rounded-lg shadow-sm">
+                        <div className="mr-3">
+                          {/* Icône correspondant au type de notification */}
+                          {getNotificationIcon(notification.type)}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-gray-700 text-sm">{notification.message}</p>
+                          <span className="text-gray-500 text-xs">{notification.date}</span>
+                        </div>
                       </li>
                     ))}
                   </ul>

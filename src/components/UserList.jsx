@@ -1,85 +1,87 @@
 import React, { useState } from 'react';
-import UserModal from './UserModal'; // Importation du composant Modal
-import { FaInfoCircle, FaEdit, FaTrashAlt } from 'react-icons/fa'; // Importation des icônes
+import { FaInfoCircle, FaEdit, FaTrash } from 'react-icons/fa';
+import DeleteModal from './DeleteModal';
+import InfoModal from './InfoModal';
+import EditModal from './EditModal';
 
-const UserList = ({ users, onDelete, setUsers }) => {
+const UserList = ({ users, onDeleteUser, onEditUser }) => {
   const [selectedUser, setSelectedUser] = useState(null);
-  const [isEditing, setIsEditing] = useState(false); // Pour déterminer si l'utilisateur est en mode édition
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  const handleUserClick = (user) => {
-    setSelectedUser(user); // Ouvre la modal avec les infos de l'utilisateur
-    setIsEditing(false); // Affiche les détails, pas en mode édition
+  const handleDeleteClick = (user) => {
+    setSelectedUser(user);
+    setIsDeleteModalOpen(true);
   };
 
-  const handleEditUser = (user) => {
-    setSelectedUser(user); // Charge l'utilisateur dans la modal
-    setIsEditing(true); // Active le mode édition
+  const handleInfoClick = (user) => {
+    setSelectedUser(user);
+    setIsInfoModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setSelectedUser(null); // Ferme la modal
-    setIsEditing(false); // Désactive le mode édition
+  const handleEditClick = (user) => {
+    setSelectedUser(user);
+    setIsEditModalOpen(true);
   };
 
-  const handleUpdateUser = (updatedUser) => {
-    // Mettre à jour l'utilisateur dans la liste
-    setUsers(users.map(user => (user.id === updatedUser.id ? updatedUser : user)));
-    handleCloseModal();
+  const handleConfirmDelete = () => {
+    onDeleteUser(selectedUser);
+    setIsDeleteModalOpen(false);
   };
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full bg-white">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="py-2 px-4">Nom</th>
-            <th className="py-2 px-4">Droits</th>
-            <th className="py-2 px-4">Statut</th>
-            <th className="py-2 px-4">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => (
-            <tr key={user.id}>
-              <td className="py-2 px-4 border">{user.name}</td>
-              <td className="py-2 px-4 border">{user.rights}</td>
-              <td className={`py-2 px-4 border ${user.status === 'online' ? 'text-green-500' : 'text-red-500'}`}>
-                {user.status === 'online' ? 'En ligne' : 'Hors ligne'}
-              </td>
-              <td className="py-2 px-4 border flex space-x-2">
-                <button 
-                  onClick={() => handleUserClick(user)}
-                  className="bg-blue-500 text-white px-3 py-1 rounded flex items-center"
-                >
-                  <FaInfoCircle className="mr-1" /> Infos
-                </button>
-                <button 
-                  onClick={() => handleEditUser(user)}
-                  className="bg-yellow-500 text-white px-3 py-1 rounded flex items-center"
-                >
-                  <FaEdit className="mr-1" /> Modifier
-                </button>
-                <button 
-                  onClick={() => onDelete(user.id)}
-                  className="bg-red-500 text-white px-3 py-1 rounded flex items-center"
-                >
-                  <FaTrashAlt className="mr-1" /> Supprimer
-                </button>
-              </td>
+    <div className="mt-4">
+    
+      <div className="overflow-auto max-h-96"> {/* Barre de défilement */}
+        <table className="min-w-full bg-white text-left">
+          <thead>
+            <tr>
+              <th className="py-2 px-4">#</th> {/* Numéros d'utilisateur */}
+              <th className="py-2 px-4">Nom</th>
+              <th className="py-2 px-4">Droits</th>
+              <th className="py-2 px-4">Statut</th>
+              <th className="py-2 px-4">Mot de passe</th> {/* Nouveau champ pour le mot de passe */}
+              <th className="py-2 px-4">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {users.map((user, index) => (
+              <tr key={index} className="border-t">
+                <td className="py-2 px-4">{index + 1}</td> {/* Numéros */}
+                <td className="py-2 px-4">{user.username}</td> {/* Correction de 'name' en 'username' */}
+                <td className="py-2 px-4">{user.role}</td>
+                <td className="py-2 px-4">{user.status === 'online' ? 'En ligne' : 'Hors ligne'}</td>
+                <td className="py-2 px-4">{user.password ? '********' : 'Non défini'}</td> {/* Afficher le mot de passe */}
+                <td className="py-2 px-4 flex space-x-3">
+                  <FaInfoCircle className="text-blue-500 cursor-pointer" onClick={() => handleInfoClick(user)} />
+                  <FaEdit className="text-yellow-500 cursor-pointer" onClick={() => handleEditClick(user)} />
+                  <FaTrash className="text-red-500 cursor-pointer" onClick={() => handleDeleteClick(user)} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      {/* Modal pour afficher ou modifier un utilisateur */}
-      {selectedUser && (
-        <UserModal 
-          user={selectedUser} 
-          onClose={handleCloseModal} 
-          onUpdate={handleUpdateUser}
-          isEditing={isEditing}
-        />
-      )}
+      <DeleteModal 
+        isOpen={isDeleteModalOpen} 
+        onClose={() => setIsDeleteModalOpen(false)} 
+        onConfirm={handleConfirmDelete} 
+      />
+      
+      <InfoModal 
+        isOpen={isInfoModalOpen} 
+        onClose={() => setIsInfoModalOpen(false)} 
+        user={selectedUser}
+      />
+
+      <EditModal 
+        isOpen={isEditModalOpen} 
+        onClose={() => setIsEditModalOpen(false)} 
+        user={selectedUser} 
+        onEditUser={onEditUser}
+      />
     </div>
   );
 };
